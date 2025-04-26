@@ -1,0 +1,6 @@
+.git
+*.db
+*.log
+*.env
+vendor
+node_modules
