@@ -12,4 +12,5 @@ type Transaction struct {
 	Amount      float64   `json:"amount"`
 	Category    string    `json:"category"`
 	CreatedAt   time.Time `json:"created_at"`
+	UserId      uint      `json:"user_id"` // Foreign Key, links to user table
 }
