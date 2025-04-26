@@ -10,6 +10,7 @@ import (
 func main() {
 	config.ConnectDB()
 	app := fiber.New()
+	routes.AuthRoutes(app)
 	routes.ExpenseTrackerRoutes(app)
 	app.Listen(":3000")
 }
