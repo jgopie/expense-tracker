@@ -2,18 +2,12 @@ package middleware
 
 import (
 	"log"
-	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func Logger() fiber.Handler {
-	file, err := os.OpenFile("server.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	if err != nil {
-		log.Fatalf("failed to open log file %v", err)
-	}
-	logger := log.New(file, "", log.LstdFlags)
+func Logger(logger *log.Logger) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		start := time.Now()
 		err := c.Next()
