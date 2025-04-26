@@ -9,7 +9,8 @@ import (
 
 func ExpenseTrackerRoutes(app *fiber.App) {
 	api := app.Group("/api")
-	api.Get("/transactions", controllers.GetTransactions, middleware.Protected())
-	api.Post("/transactions", controllers.CreateTransaction, middleware.Protected())
-	api.Delete("/transactions/:id", controllers.DeleteTransaction, middleware.Protected())
+	transactions := api.Group("/transactions", middleware.Protected())
+	transactions.Get("/", controllers.GetTransactions)
+	transactions.Post("/", controllers.CreateTransaction)
+	transactions.Delete("/:id", controllers.DeleteTransaction)
 }
