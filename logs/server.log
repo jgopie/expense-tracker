@@ -3,3 +3,5 @@
 2025/04/26 17:18:05 [POST] /api/transactions 401 12.618µs
 2025/04/26 17:20:09 [POST] /api/transactions 200 12.703481ms
 2025/04/26 17:20:27 [GET] /api/transactions 200 361.492µs
+2025/04/26 18:51:57 [OPTIONS] /api/users/register 200 35.613µs
+2025/04/26 18:52:15 [OPTIONS] /api/users/register 200 9.095µs
