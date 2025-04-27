@@ -3,6 +3,8 @@ package controllers
 import (
 	"expense-tracker/config"
 	"expense-tracker/models"
+	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,15 +17,35 @@ func GetTransactions(c *fiber.Ctx) error {
 }
 
 func CreateTransaction(c *fiber.Ctx) error {
-	transaction := new(models.Transaction)
-	if err := c.BodyParser(transaction); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "cannot parse json"})
+	amount, err := strconv.ParseFloat(c.FormValue("amount"), 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).Render("add", fiber.Map{
+			"Title": "Add Expense",
+			"Error": "Invalid amount",
+		})
 	}
-	userID := c.Locals("user_id").(float64)
-	transaction.UserId = uint(userID)
 
-	config.DB.Create(&transaction)
-	return c.JSON(transaction)
+	userID, ok := c.Locals("user_id").(float64)
+	if !ok {
+		return c.Redirect("/login")
+	}
+
+	transaction := models.Transaction{
+		Description: c.FormValue("description"),
+		Amount:      amount,
+		Category:    c.FormValue("category"),
+		CreatedAt:   time.Now(), // Or parse date from form
+		UserId:      uint(userID),
+	}
+
+	if err := config.DB.Create(&transaction).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).Render("add", fiber.Map{
+			"Title": "Add Expense",
+			"Error": "Failed to save transaction",
+		})
+	}
+
+	return c.Redirect("/")
 }
 
 func DeleteTransaction(c *fiber.Ctx) error {

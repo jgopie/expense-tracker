@@ -7,8 +7,6 @@ import (
 )
 
 func ExpenseTrackerRoutes(app *fiber.App) {
-	app.Get("/transactions", controllers.GetTransactions)
-	app.Post("/transactions", controllers.CreateTransaction)
-	app.Delete("/transactions/:id", controllers.DeleteTransaction)
-	app.Get("/add", controllers.RenderAddTransactionPage)
+	app.Get("/transactions/add", controllers.RenderAddTransactionPage)
+	app.Post("/transactions/add", controllers.CreateTransaction)
 }

@@ -30,8 +30,7 @@ func ProcessLoginForm(c *fiber.Ctx) error {
 	password := c.FormValue("password")
 
 	var user models.User
-	config.DB.Where("email = ?", email).First(&user)
-	if user.ID == 0 {
+	if err := config.DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return c.Render("login", fiber.Map{
 			"Title": "Login - Expense Tracker",
 			"Error": "Invalid email or password",
@@ -45,10 +44,13 @@ func ProcessLoginForm(c *fiber.Ctx) error {
 		})
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.ID,
+	// Create token with claims
+	claims := jwt.MapClaims{
+		"user_id": user.ID, // Ensure this is set as float64
 		"exp":     time.Now().Add(time.Hour * 72).Unix(),
-	})
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenStr, err := token.SignedString(jwtSecret)
 	if err != nil {
