@@ -2,15 +2,13 @@ package routes
 
 import (
 	"expense-tracker/controllers"
-	"expense-tracker/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func ExpenseTrackerRoutes(app *fiber.App) {
-	api := app.Group("/api")
-	transactions := api.Group("/transactions", middleware.Protected())
-	transactions.Get("/", controllers.GetTransactions)
-	transactions.Post("/", controllers.CreateTransaction)
-	transactions.Delete("/:id", controllers.DeleteTransaction)
+	app.Get("/transactions", controllers.GetTransactions)
+	app.Post("/transactions", controllers.CreateTransaction)
+	app.Delete("/transactions/:id", controllers.DeleteTransaction)
+	app.Get("/add", controllers.RenderAddTransactionPage)
 }

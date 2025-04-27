@@ -40,3 +40,9 @@ func DeleteTransaction(c *fiber.Ctx) error {
 	config.DB.Delete(&transaction)
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+func RenderAddTransactionPage(c *fiber.Ctx) error {
+	return c.Render("add", fiber.Map{
+		"Title": "Add Transaction - Expense Tracker",
+	})
+}
