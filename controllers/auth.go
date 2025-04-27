@@ -12,62 +12,6 @@ import (
 
 var jwtSecret = []byte("myjwtsecret")
 
-func Register(c *fiber.Ctx) error {
-	var data map[string]string
-	if err := c.BodyParser(&data); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request"})
-	}
-	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
-	user := models.User{
-		Name:     data["name"],
-		Email:    data["email"],
-		Password: string(password),
-	}
-	result := config.DB.Create(&user)
-	if result.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "error with user registration"})
-	}
-	return c.JSON(user)
-}
-
-func Login(c *fiber.Ctx) error {
-	var data map[string]string
-	if err := c.BodyParser(&data); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request"})
-	}
-	var user models.User
-	config.DB.Where("email = ?", data["email"]).First(&user)
-
-	if user.ID == 0 {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid username or password"})
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data["password"])); err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid username or password"})
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.ID,
-		"exp":     time.Now().Add(time.Hour * 72).Unix(),
-	})
-
-	tokenStr, err := token.SignedString(jwtSecret)
-	if err != nil {
-		return c.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	cookie := fiber.Cookie{
-		Name:     "token",
-		Value:    tokenStr,
-		Expires:  time.Now().Add(time.Hour * 24),
-		HTTPOnly: true,
-		Secure:   false,
-		SameSite: "Lax",
-	}
-	c.Cookie(&cookie)
-
-	return c.JSON(fiber.Map{"token": tokenStr})
-}
-
 func RenderLoginPage(c *fiber.Ctx) error {
 	return c.Render("login", fiber.Map{
 		"Title": "Login - Expense Tracker",
@@ -124,7 +68,7 @@ func ProcessLoginForm(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&cookie)
-	return c.Redirect("/dashboard")
+	return c.Redirect("/")
 }
 
 func ProcessRegisterForm(c *fiber.Ctx) error {
@@ -181,25 +125,6 @@ func ProcessRegisterForm(c *fiber.Ctx) error {
 	}
 
 	return c.Redirect("/login?registered=true")
-}
-
-// Middleware to check if user is authenticated
-func AuthRequired(c *fiber.Ctx) error {
-	cookie := c.Cookies("token")
-
-	if cookie == "" {
-		return c.Redirect("/login")
-	}
-
-	token, err := jwt.Parse(cookie, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	})
-
-	if err != nil || !token.Valid {
-		return c.Redirect("/login")
-	}
-
-	return c.Next()
 }
 
 // Logout handler

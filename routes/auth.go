@@ -7,10 +7,13 @@ import (
 )
 
 func AuthRoutes(app *fiber.App) {
-	api := app.Group("/api")
-	users := api.Group("/users")
-	users.Post("/register", controllers.Register)
-	users.Post("/login", controllers.Login)
-	users.Get("/register", controllers.RenderRegistrationPage)
-	users.Get("/login", controllers.RenderLoginPage)
+	app.Get("/register", controllers.RenderRegistrationPage)
+	app.Get("/login", controllers.RenderLoginPage)
+	app.Post("/register", controllers.ProcessRegisterForm)
+	app.Post("/login", controllers.ProcessLoginForm)
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Render("index", fiber.Map{
+			"Title": "Expense Tracker",
+		})
+	})
 }

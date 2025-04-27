@@ -30,6 +30,7 @@ func main() {
 	defer file.Close()
 	logger := log.New(file, "", log.LstdFlags)
 	app.Use(middleware.Logger(logger))
+	app.Use(middleware.CheckAuth())
 	routes.AuthRoutes(app)
 	routes.ExpenseTrackerRoutes(app)
 	app.Listen("0.0.0.0:3000")
