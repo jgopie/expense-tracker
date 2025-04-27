@@ -8,18 +8,21 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/template/html/v2"
 )
 
 func main() {
 	config.ConnectDB()
-	app := fiber.New()
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:5173",
-		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
-		AllowCredentials: true,
-	}))
+	app := fiber.New(fiber.Config{
+		Views: html.New("/root/views", ".html"),
+	})
+	app.Static("/static", "./static")
+
+	// Flag explanation (just in case)
+	// O_Append - New information is appended instead of overwriting the contents
+	// O_Create - File is created if it doesn't exist
+	// O_Wronlg - Write Only. File is opened for writing only, not reading
+	// 0666 - Permissions, very permissive which is the norm for log files
 	file, err := os.OpenFile("/root/logs/server.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatalf("failed to open log file %v", err)

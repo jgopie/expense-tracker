@@ -23,6 +23,8 @@ RUN apk add --no-cache ca-certificates
 WORKDIR /root/
 
 COPY --from=builder /app/expense-tracker .
+COPY --from=builder /app/views ./views
+COPY --from=builder /app/static ./static
 
 EXPOSE 3000
 CMD ["./expense-tracker"]

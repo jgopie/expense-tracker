@@ -1,0 +1,223 @@
+/* static/css/style.css */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.actions {
+    margin-bottom: 20px;
+}
+
+.btn {
+    display: inline-block;
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn:hover {
+    background: #2980b9;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.danger {
+    background: #e74c3c;
+}
+
+.danger:hover {
+    background: #c0392b;
+}
+
+.secondary {
+    background: #95a5a6;
+}
+
+.secondary:hover {
+    background: #7f8c8d;
+}
+
+.primary {
+    background: #3498db;
+}
+
+.primary:hover {
+    background: #2980b9;
+}
+
+.expense-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.expense-table th, 
+.expense-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.expense-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.no-expenses {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.expense-form {
+    background: white;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Auth styles */
+.auth-form {
+    max-width: 400px;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.auth-form h1 {
+    font-size: 24px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.auth-form .form-actions {
+    justify-content: center;
+}
+
+.auth-form .form-actions button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.auth-links {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.auth-links a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    background-color: #fadbd8;
+    color: #c0392b;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border-left: 4px solid #e74c3c;
+}
+
+.success-message {
+    background-color: #d4efdf;
+    color: #27ae60;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2ecc71;
+}
+
+/* Header and navigation */
+.header {
+    background: #2c3e50;
+    color: white;
+    padding: 15px 0;
+    margin-bottom: 30px;
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    margin: 0;
+    color: white;
+    font-size: 20px;
+}
+
+.nav-links {
+    display: flex;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
