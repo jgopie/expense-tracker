@@ -1,30 +1,29 @@
 FROM golang:1.24-alpine AS builder
-
-RUN apk add --no-cache gcc musl-dev
-
-ENV CGO_ENABLED=1 \
-    GOOS=linux \
-    GOARCH=amd64
+RUN apk add --no-cache gcc musl-dev git
 
 WORKDIR /app
-COPY go.mod ./
-COPY go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
-
 COPY . .
-
 RUN go build -o expense-tracker
 
-# Run the application
 FROM alpine:latest
+RUN apk add --no-cache ca-certificates sqlite tzdata
 
-RUN apk add --no-cache ca-certificates
+# Create app structure with correct permissions
+RUN mkdir -p /app/data && \
+    chown -R nobody:nobody /app && \
+    chmod -R 775 /app
 
-WORKDIR /root/
+WORKDIR /app
+USER nobody
 
 COPY --from=builder /app/expense-tracker .
 COPY --from=builder /app/views ./views
 COPY --from=builder /app/static ./static
+
+ENV DB_PATH=/app/data/transactions.db \
+    TZ=UTC
 
 EXPOSE 3000
 CMD ["./expense-tracker"]

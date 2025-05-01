@@ -14,7 +14,7 @@ import (
 func main() {
 	config.ConnectDB()
 	app := fiber.New(fiber.Config{
-		Views: html.New("/root/views", ".html"),
+		Views: html.New("./views", ".html"),
 	})
 	app.Static("/static", "./static")
 
@@ -23,7 +23,11 @@ func main() {
 	// O_Create - File is created if it doesn't exist
 	// O_Wronlg - Write Only. File is opened for writing only, not reading
 	// 0666 - Permissions, very permissive which is the norm for log files
-	file, err := os.OpenFile("/root/logs/server.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	logPath := os.Getenv("LOG_PATH")
+	if logPath == "" {
+		logPath = "./logs/server.logs"
+	}
+	file, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatalf("failed to open log file %v", err)
 	}

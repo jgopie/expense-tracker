@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data:rw  # Explicit read-write
+      - ./logs:/app/logs:rw
+    environment:
+      - DB_PATH=/app/data/transactions.db
+    user: "1000:1000"  # Match your host user ID
+    restart: unless-stopped
