@@ -2,6 +2,7 @@ package config
 
 import (
 	"expense-tracker/models"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -29,11 +30,55 @@ func ConnectDB() {
 		log.Fatalf("Failed to create database file: %v", err)
 	}
 
-	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
 	DB = db
-	db.AutoMigrate(&models.Transaction{}, &models.User{})
+	db.AutoMigrate(&models.Transaction{}, &models.User{}, &models.Account{})
+}
+
+func RunMigrations(db *gorm.DB) error {
+	// Check if accounts table exists
+	var table string
+	db.Raw("SELECT name FROM sqlite_master WHERE type='table' AND name='accounts'").Scan(&table)
+
+	if table == "" {
+		// Run initial migration
+		if err := db.Exec(`ALTER TABLE transactions ADD COLUMN account_id INTEGER`).Error; err != nil {
+			return fmt.Errorf("failed to add account_id column: %v", err)
+		}
+
+		if err := db.AutoMigrate(&models.Account{}); err != nil {
+			return fmt.Errorf("failed to create accounts table: %v", err)
+		}
+
+		// Create default account for existing users
+		var users []models.User
+		if err := db.Find(&users).Error; err != nil {
+			return fmt.Errorf("failed to find users: %v", err)
+		}
+
+		for _, user := range users {
+			defaultAccount := models.Account{
+				Name:    "Default Account",
+				Balance: 0,
+				UserId:  user.ID,
+			}
+			if err := db.Create(&defaultAccount).Error; err != nil {
+				return fmt.Errorf("failed to create default account: %v", err)
+			}
+
+			// Associate existing transactions with default account
+			if err := db.Model(&models.Transaction{}).
+				Where("user_id = ?", user.ID).
+				Update("account_id", defaultAccount.ID).Error; err != nil {
+				return fmt.Errorf("failed to update transactions: %v", err)
+			}
+		}
+	}
+	return nil
 }

@@ -1,4 +1,3 @@
-<!-- views/add.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,9 +8,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>Add New Expense</h1>
+        <h1>Add New Transaction</h1>
         
-        <form action="/transactions/add" method="POST" class="expense-form">
+        <form action="/transactions" method="POST" class="transaction-form">
+            <div class="form-group">
+                <label for="account_id">Account</label>
+                <select id="account_id" name="account_id" required>
+                    {{range .Accounts}}
+                    <option value="{{.ID}}">{{.Name}} (${{printf "%.2f" .Balance}})</option>
+                    {{end}}
+                </select>
+            </div>
+            
             <div class="form-group">
                 <label for="description">Description</label>
                 <input type="text" id="description" name="description" required>
@@ -19,7 +27,7 @@
             
             <div class="form-group">
                 <label for="amount">Amount</label>
-                <input type="number" id="amount" name="amount" step="0.01" min="0" required>
+                <input type="number" id="amount" name="amount" step="0.01" min="0.01" required>
             </div>
             
             <div class="form-group">
@@ -29,7 +37,7 @@
             
             <div class="form-group">
                 <label for="category">Category</label>
-                <select id="category" name="category">
+                <select id="category" name="category" required>
                     <option value="Food">Food</option>
                     <option value="Transportation">Transportation</option>
                     <option value="Housing">Housing</option>
@@ -40,8 +48,8 @@
             </div>
             
             <div class="form-actions">
-                <a href="/" class="btn secondary">Cancel</a>
-                <button type="submit" class="btn primary">Save Expense</button>
+                <a href="/dashboard" class="btn secondary">Cancel</a>
+                <button type="submit" class="btn primary">Save Transaction</button>
             </div>
         </form>
     </div>

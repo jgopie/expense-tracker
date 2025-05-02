@@ -8,16 +8,25 @@ import (
 )
 
 func Dashboard(c *fiber.Ctx) error {
-	// Get user_id from locals
-	userID, ok := c.Locals("user_id").(float64)
-	if !ok {
-		return c.Redirect("/login")
+	userID := c.Locals("user_id").(float64)
+
+	// Get accounts with balances
+	var accounts []models.Account
+	if err := config.DB.
+		Where("user_id = ?", uint(userID)).
+		Find(&accounts).Error; err != nil {
+		return c.Status(500).SendString("Error fetching accounts")
 	}
 
-	// Get transactions for this user
+	// Get recent transactions with account info
 	var transactions []models.Transaction
-	if err := config.DB.Where("user_id = ?", uint(userID)).Order("created_at desc").Find(&transactions).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Server error")
+	if err := config.DB.
+		Joins("Account"). // Changed from Preload to Joins for SQLite
+		Where("transactions.user_id = ?", uint(userID)).
+		Order("transactions.created_at desc").
+		Limit(10).
+		Find(&transactions).Error; err != nil {
+		return c.Status(500).SendString("Error fetching transactions")
 	}
 
 	// Calculate totals
@@ -30,6 +39,7 @@ func Dashboard(c *fiber.Ctx) error {
 
 	return c.Render("dashboard", fiber.Map{
 		"Title":         "Dashboard",
+		"Accounts":      accounts,
 		"Transactions":  transactions,
 		"TotalExpenses": totalExpenses,
 		"CategoryData":  categoryTotals,

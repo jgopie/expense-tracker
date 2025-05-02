@@ -13,4 +13,6 @@ type Transaction struct {
 	Category    string    `json:"category"`
 	CreatedAt   time.Time `json:"created_at"`
 	UserId      uint      `json:"user_id"` // Foreign Key, links to user table
+	AccountId   uint      `json:"account_id"`
+	Account     Account   `json:"account" gorm:"foreignKey:AccountId"`
 }

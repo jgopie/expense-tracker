@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func GetTransactions(c *fiber.Ctx) error {
@@ -17,30 +18,65 @@ func GetTransactions(c *fiber.Ctx) error {
 }
 
 func CreateTransaction(c *fiber.Ctx) error {
+	userID := c.Locals("user_id").(float64)
+
+	// Parse form data
 	amount, err := strconv.ParseFloat(c.FormValue("amount"), 64)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).Render("add", fiber.Map{
-			"Title": "Add Expense",
+		return c.Status(400).Render("add", fiber.Map{
+			"Title": "Add Transaction",
 			"Error": "Invalid amount",
 		})
 	}
 
-	userID, ok := c.Locals("user_id").(float64)
-	if !ok {
-		return c.Redirect("/login")
+	accountID, err := strconv.ParseUint(c.FormValue("account_id"), 10, 32)
+	if err != nil {
+		return c.Status(400).Render("add", fiber.Map{
+			"Title": "Add Transaction",
+			"Error": "Invalid account",
+		})
 	}
 
+	// Verify account belongs to user
+	var account models.Account
+	if err := config.DB.
+		Where("id = ? AND user_id = ?", accountID, uint(userID)).
+		First(&account).Error; err != nil {
+		return c.Status(400).Render("add", fiber.Map{
+			"Title": "Add Transaction",
+			"Error": "Invalid account selection",
+		})
+	}
+
+	// Create transaction
 	transaction := models.Transaction{
 		Description: c.FormValue("description"),
 		Amount:      amount,
 		Category:    c.FormValue("category"),
-		CreatedAt:   time.Now(), // Or parse date from form
+		CreatedAt:   time.Now(), // Or parse from form
 		UserId:      uint(userID),
+		AccountId:   uint(accountID),
 	}
 
-	if err := config.DB.Create(&transaction).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).Render("add", fiber.Map{
-			"Title": "Add Expense",
+	// Update account balance in a transaction
+	err = config.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&transaction).Error; err != nil {
+			return err
+		}
+
+		newBalance := account.Balance + transaction.Amount
+		if err := tx.Model(&models.Account{}).
+			Where("id = ?", accountID).
+			Update("balance", newBalance).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return c.Status(500).Render("add", fiber.Map{
+			"Title": "Add Transaction",
 			"Error": "Failed to save transaction",
 		})
 	}
@@ -64,7 +100,15 @@ func DeleteTransaction(c *fiber.Ctx) error {
 }
 
 func RenderAddTransactionPage(c *fiber.Ctx) error {
+	userID := c.Locals("user_id").(float64)
+
+	var accounts []models.Account
+	if err := config.DB.Where("user_id = ?", uint(userID)).Find(&accounts).Error; err != nil {
+		return c.Status(500).SendString("Error fetching accounts")
+	}
+
 	return c.Render("add", fiber.Map{
-		"Title": "Add Transaction - Expense Tracker",
+		"Title":    "Add Transaction",
+		"Accounts": accounts,
 	})
 }

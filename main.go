@@ -6,6 +6,7 @@ import (
 	"expense-tracker/routes"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
@@ -13,8 +14,19 @@ import (
 
 func main() {
 	config.ConnectDB()
+	if err := config.RunMigrations(config.DB); err != nil {
+		log.Fatalf("Migration failed: %v", err)
+	}
+	engine := html.New("./views", ".html")
+	engine.AddFunc("percentage", func(a, b float64) float64 {
+		if b == 0 {
+			return 0
+		}
+		return (a / b) * 100
+	})
+	engine.AddFunc("toLower", strings.ToLower)
 	app := fiber.New(fiber.Config{
-		Views: html.New("./views", ".html"),
+		Views: engine,
 	})
 	app.Static("/static", "./static")
 
@@ -37,5 +49,6 @@ func main() {
 	app.Use(middleware.CheckAuth())
 	routes.AuthRoutes(app)
 	routes.ExpenseTrackerRoutes(app)
+	routes.AccountRoutes(app)
 	app.Listen("0.0.0.0:3000")
 }
