@@ -17,57 +17,47 @@ func GetTransactions(c *fiber.Ctx) error {
 	return c.JSON(transactions)
 }
 
+// controllers/transaction.go
 func CreateTransaction(c *fiber.Ctx) error {
-	userID := c.Locals("user_id").(float64)
-
 	// Parse form data
 	amount, err := strconv.ParseFloat(c.FormValue("amount"), 64)
 	if err != nil {
 		return c.Status(400).Render("add", fiber.Map{
-			"Title": "Add Transaction",
-			"Error": "Invalid amount",
+			"Error":    "Invalid amount format",
+			"Accounts": c.Locals("accounts"),
 		})
 	}
 
 	accountID, err := strconv.ParseUint(c.FormValue("account_id"), 10, 32)
 	if err != nil {
 		return c.Status(400).Render("add", fiber.Map{
-			"Title": "Add Transaction",
-			"Error": "Invalid account",
+			"Error":    "Invalid account",
+			"Accounts": c.Locals("accounts"),
 		})
 	}
 
-	// Verify account belongs to user
-	var account models.Account
-	if err := config.DB.
-		Where("id = ? AND user_id = ?", accountID, uint(userID)).
-		First(&account).Error; err != nil {
-		return c.Status(400).Render("add", fiber.Map{
-			"Title": "Add Transaction",
-			"Error": "Invalid account selection",
-		})
-	}
+	userID := c.Locals("user_id").(float64)
 
-	// Create transaction
-	transaction := models.Transaction{
-		Description: c.FormValue("description"),
-		Amount:      amount,
-		Category:    c.FormValue("category"),
-		CreatedAt:   time.Now(), // Or parse from form
-		UserId:      uint(userID),
-		AccountId:   uint(accountID),
-	}
-
-	// Update account balance in a transaction
+	// Start database transaction
 	err = config.DB.Transaction(func(tx *gorm.DB) error {
+		// Create the transaction
+		transaction := models.Transaction{
+			Description: c.FormValue("description"),
+			Amount:      amount,
+			Category:    c.FormValue("category"),
+			UserId:      uint(userID),
+			AccountId:   uint(accountID),
+			CreatedAt:   time.Now(),
+		}
+
 		if err := tx.Create(&transaction).Error; err != nil {
 			return err
 		}
 
-		newBalance := account.Balance + transaction.Amount
+		// Update account balance
 		if err := tx.Model(&models.Account{}).
 			Where("id = ?", accountID).
-			Update("balance", newBalance).Error; err != nil {
+			Update("balance", gorm.Expr("balance + ?", amount)).Error; err != nil {
 			return err
 		}
 
@@ -76,8 +66,8 @@ func CreateTransaction(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(500).Render("add", fiber.Map{
-			"Title": "Add Transaction",
-			"Error": "Failed to save transaction",
+			"Error":    "Failed to save transaction",
+			"Accounts": c.Locals("accounts"),
 		})
 	}
 
