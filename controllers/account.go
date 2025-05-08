@@ -43,3 +43,16 @@ func CreateAccount(c *fiber.Ctx) error {
 
 	return c.Redirect("/accounts")
 }
+
+func DeleteAccount(c *fiber.Ctx) error {
+	userId := c.Locals("user_id").(float64)
+	accountId := c.Params("id")
+	result := config.DB.Where("id = ? AND user_id = ?", accountId, uint(userId)).Delete(&models.Account{})
+	if result.Error != nil {
+		return c.Status(500).SendString("error deleting account")
+	}
+	if result.RowsAffected == 0 {
+		return c.Status(404).SendString("account not found")
+	}
+	return c.Redirect("/accounts")
+}

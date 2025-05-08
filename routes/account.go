@@ -12,4 +12,6 @@ func AccountRoutes(app *fiber.App) {
 	app.Get("/accounts/new", func(c *fiber.Ctx) error {
 		return c.Render("new_account", fiber.Map{"Title": "New Account"})
 	})
+	app.Delete("/accounts/:id", controllers.DeleteAccount)
+	app.Post("/accounts/:id/delete", controllers.DeleteAccount)
 }

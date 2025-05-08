@@ -47,6 +47,7 @@ func main() {
 	logger := log.New(file, "", log.LstdFlags)
 	app.Use(middleware.Logger(logger))
 	app.Use(middleware.CheckAuth())
+	app.Use(middleware.MethodOverride())
 	routes.AuthRoutes(app)
 	routes.ExpenseTrackerRoutes(app)
 	routes.AccountRoutes(app)

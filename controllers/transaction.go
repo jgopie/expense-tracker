@@ -85,18 +85,41 @@ func CreateTransaction(c *fiber.Ctx) error {
 }
 
 func DeleteTransaction(c *fiber.Ctx) error {
-	id := c.Params("id")
 	userID := c.Locals("user_id").(float64)
+	transactionID := c.Params("id")
 
-	var transaction models.Transaction
-	config.DB.First(&transaction, id)
+	// Start database transaction
+	err := config.DB.Transaction(func(tx *gorm.DB) error {
+		// First get the transaction with account info
+		var transaction models.Transaction
+		if err := tx.
+			Where("id = ? AND user_id = ?", transactionID, uint(userID)).
+			First(&transaction).Error; err != nil {
+			return err // Transaction not found or doesn't belong to user
+		}
 
-	if transaction.UserId != uint(userID) {
-		c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "unauthorized"})
+		// Update the account balance
+		if err := tx.Model(&models.Account{}).
+			Where("id = ?", transaction.AccountId).
+			Update("balance", gorm.Expr("balance - ?", transaction.Amount)).Error; err != nil {
+			return err
+		}
+
+		// Delete the transaction
+		if err := tx.Delete(&transaction).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Failed to delete transaction",
+		})
 	}
 
-	config.DB.Delete(&transaction)
-	return c.SendStatus(fiber.StatusNoContent)
+	return c.Redirect("/")
 }
 
 func RenderAddTransactionPage(c *fiber.Ctx) error {

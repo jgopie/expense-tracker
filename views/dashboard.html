@@ -8,21 +8,27 @@
 </head>
 <body>
     <div class="container">
-        <h1>Expense Dashboard</h1>
-        
-        <div class="account-summary">
+        <header>
+            <h1>Expense Dashboard</h1>
+            <nav>
+                <a href="/transactions/add" class="btn primary">Add Transaction</a>
+                <a href="/accounts" class="btn">Manage Accounts</a>
+            </nav>
+        </header>
+
+        <section class="account-summary">
             <h2>Account Balances</h2>
             <div class="account-cards">
                 {{range .Accounts}}
-                <div class="account-card">
+                <div class="account-card {{if lt .Balance 0.0}}negative{{end}}">
                     <h3>{{.Name}}</h3>
                     <div class="balance">${{printf "%.2f" .Balance}}</div>
                 </div>
                 {{end}}
             </div>
-        </div>
-        
-        <div class="recent-transactions">
+        </section>
+
+        <section class="recent-transactions">
             <h2>Recent Transactions</h2>
             <table>
                 <thead>
@@ -31,6 +37,7 @@
                         <th>Account</th>
                         <th>Description</th>
                         <th>Amount</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,14 +46,22 @@
                         <td>{{.CreatedAt.Format "Jan 02"}}</td>
                         <td>{{.Account.Name}}</td>
                         <td>{{.Description}}</td>
-                        <td>${{printf "%.2f" .Amount}}</td>
+                        <td class="{{if lt .Amount 0.0}}expense{{else}}income{{end}}">
+                            ${{printf "%.2f" .Amount}}
+                        </td>
+                        <td>
+                            <form action="/transactions/{{.ID}}/delete" method="POST">
+                                <button type="submit" class="btn danger small" 
+                                        onclick="return confirm('Delete this transaction?')">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     {{end}}
                 </tbody>
             </table>
-            <a href="/transactions/add" class="button">Add Transaction</a>
-            <a href="/accounts" class="button">Accounts</a>
-        </div>
+        </section>
     </div>
 </body>
 </html>

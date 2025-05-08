@@ -1,75 +1,211 @@
-/* Basic Reset */
+/* ===== Base Styles ===== */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
+  color: #333;
+  background-color: #f8f9fa;
   margin: 0;
   padding: 20px;
-  color: #333;
 }
 
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 15px;
 }
 
-/* Account Cards */
-.account-cards {
+h1, h2, h3 {
+  color: #2c3e50;
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+
+h3 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+/* ===== Header & Navigation ===== */
+header {
   display: flex;
-  gap: 15px;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+nav {
+  display: flex;
+  gap: 10px;
+}
+
+/* ===== Button Styles ===== */
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn.primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn.primary:hover {
+  background-color: #2980b9;
+}
+
+.btn.secondary {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.btn.secondary:hover {
+  background-color: #7f8c8d;
+}
+
+.btn.danger {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn.danger:hover {
+  background-color: #c0392b;
+}
+
+.btn.small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+/* ===== Account Cards ===== */
+.account-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .account-card {
-  background: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 15px;
-  min-width: 200px;
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-left: 4px solid #3498db;
+}
+
+.account-card.negative {
+  border-left-color: #e74c3c;
 }
 
 .account-card h3 {
-  margin-top: 0;
-  color: #2c3e50;
+  margin-bottom: 0.5rem;
 }
 
 .balance {
-  font-size: 1.5em;
+  font-size: 1.8rem;
   font-weight: bold;
+  margin: 1rem 0;
 }
 
-/* Transactions Table */
+.account-card.negative .balance {
+  color: #e74c3c;
+}
+
+/* ===== Tables ===== */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 th, td {
-  padding: 12px 15px;
+  padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #e1e1e1;
 }
 
 th {
   background-color: #f2f2f2;
+  font-weight: 600;
 }
 
 tr:hover {
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
 }
 
-/* Button */
-.button {
-  display: inline-block;
-  background: #3498db;
-  color: white;
-  padding: 10px 20px;
-  text-decoration: none;
-  border-radius: 5px;
-  margin-top: 10px;
+.income {
+  color: #27ae60;
 }
 
-.button:hover {
-  background: #2980b9;
+.expense {
+  color: #e74c3c;
+}
+
+/* ===== Forms ===== */
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+/* ===== Delete Forms ===== */
+.delete-form {
+  display: inline;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .account-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  table {
+    display: block;
+    overflow-x: auto;
+  }
 }
