@@ -209,3 +209,13 @@ tr:hover {
     overflow-x: auto;
   }
 }
+
+/* Export Button */
+.export-actions {
+  margin: 20px 0;
+  text-align: right;
+}
+
+.btn.primary i {
+  margin-right: 8px;
+}

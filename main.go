@@ -33,7 +33,7 @@ func main() {
 	// Flag explanation (just in case)
 	// O_Append - New information is appended instead of overwriting the contents
 	// O_Create - File is created if it doesn't exist
-	// O_Wronlg - Write Only. File is opened for writing only, not reading
+	// O_Wronly - Write Only. File is opened for writing only, not reading
 	// 0666 - Permissions, very permissive which is the norm for log files
 	logPath := os.Getenv("LOG_PATH")
 	if logPath == "" {
