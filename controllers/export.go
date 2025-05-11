@@ -34,7 +34,7 @@ func ExportTransactions(c *fiber.Ctx) error {
 	}
 	for _, t := range transactions {
 		record := []string{
-			t.CreatedAt.Format("2009-01-02"),
+			t.CreatedAt.Format("2006-01-02"),
 			t.Account.Name,
 			t.Description,
 			fmt.Sprintf("%.2f", t.Amount),

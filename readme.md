@@ -11,7 +11,7 @@
 - **Real-Time Balance Tracking**  
   Automatic account balance synchronization
 - **Data Export**  
-  Download transactions as CSV for external analysis (Time format still needs to be fixed right now)
+  Download transactions as CSV for external analysis
 - **Responsive UI**  
   Works on desktop and mobile devices
 
